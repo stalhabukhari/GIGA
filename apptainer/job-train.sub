@@ -1,0 +1,39 @@
+#!/bin/bash
+# ------- slurm job -------
+module load gcc/9.3.0
+module load cuda/11.7.0
+module load utilities
+module load monitor
+
+#SBATCH --job-name=jax-train
+#SBATCH --output=log%j.out
+#SBATCH --error=log%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=bukhars@purdue.edu
+
+# reset time
+SECONDS=0
+
+# execute training
+REPO_DIR=$(dirname $(pwd))
+
+# # packed
+# TRAIN_CMD="python scripts/train_giga.py \
+#     --dataset /data-dir/data_packed_train_processed_dex_noise/ \
+#     --dataset_raw /data-dir/data_packed_train_raw/ \
+#     --logdir /runs-dir/ && \
+#     echo 'Done PACKED'"
+
+# piled
+TRAIN_CMD="python scripts/train_giga.py \
+    --dataset /data-dir/data_pile_train_processed_dex_noise/ \
+    --dataset_raw /data-dir/data_pile_train_raw/ \
+    --logdir /runs-dir/"
+
+RUN_STR="cd $REPO_DIR && $TRAIN_CMD && echo 'Done PILED'"
+apptainer run --nv -B $REPO_DIR:/code-dir -B $WORK_DIR/GIGA/data:/data-dir \
+    -B $WORK_DIR/GIGA/runs:/runs-dir giga.sif "$RUN_STR"
+
+# elapsed time
+echo "**************************************"
+echo "--- Elapsed time: $(($SECONDS / 3600)) hrs, $((($SECONDS / 60) % 60)) min and $(($SECONDS % 60)) sec. ---"

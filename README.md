@@ -110,6 +110,22 @@ As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), dat
 
 You can try `wget --no-check-certificate $wget_link` for direct download.
 
+---
+
+PS: Simply run the following to download all dataset to the `data` folder:
+
+```shell
+mkdir data && cd data && \
+    wget https://utexas.box.com/shared/static/w1abs6xfe8d2fo0h9k4bxsdgtnvuwprj.zip && \
+    wget https://utexas.box.com/shared/static/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2.zip && \
+    wget https://utexas.box.com/shared/static/roaozwxiikr27rgeauxs3gsgpwry7gk7.zip && \
+    wget https://utexas.box.com/shared/static/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn.zip
+```
+
+followed by the `data/urdfs/` folder (from `data.zip`, downloaded manually, see above).
+
+---
+
 ## Related Repositories
 
 1. Our code is largely based on [VGN](https://github.com/ethz-asl/vgn) 
