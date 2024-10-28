@@ -1,24 +1,21 @@
 #!/bin/bash
+#SBATCH --job-name=giga-train
+#SBATCH --output=slurm-%j.out
+#SBATCH --mail-type=END,FAIL,TIME_LIMIT
+#SBATCH --mail-user=bukhars@purdue.edu
+
 # ------- slurm job -------
 module load gcc/9.3.0
 module load cuda/11.7.0
 module load utilities
 module load monitor
 
-#SBATCH --job-name=jax-train
-#SBATCH --output=log%j.out
-#SBATCH --error=log%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=bukhars@purdue.edu
-
 # ------- monitors -------
 # track all GPUs (one monitor per host)
-mpiexec -machinefile <(srun hostname | sort -u) \
-    monitor gpu memory --csv > gpu-memory.csv &
+monitor gpu memory --csv > slurm-$SLURM_JOB_ID-gpumem.csv &
 GPU_PID=$!
 # track all CPUs (one monitor per host)
-mpiexec -machinefile <(srun hostname | sort -u) \
-    monitor cpu percent --all-cores >cpu-percent.log &
+monitor cpu percent --all-cores > slurm-$SLURM_JOB_ID-cpuperc.log &
 CPU_PID=$!
 # ------------------------
 
