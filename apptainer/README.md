@@ -4,8 +4,7 @@
 
 ```shell
 # always on start-up
-source /depot/bera89/data/talha/init-scripts/load.sh
-source /depot/bera89/data/talha/init-scripts/define.sh
+ml_all
 source define.sh
 ```
 

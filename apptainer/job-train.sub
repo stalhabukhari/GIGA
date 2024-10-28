@@ -11,16 +11,28 @@ module load monitor
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=bukhars@purdue.edu
 
+# ------- monitors -------
+# track all GPUs (one monitor per host)
+mpiexec -machinefile <(srun hostname | sort -u) \
+    monitor gpu memory --csv > gpu-memory.csv &
+GPU_PID=$!
+# track all CPUs (one monitor per host)
+mpiexec -machinefile <(srun hostname | sort -u) \
+    monitor cpu percent --all-cores >cpu-percent.log &
+CPU_PID=$!
+# ------------------------
+
 # reset time
 SECONDS=0
 
 # execute training
 REPO_DIR=$(dirname $(pwd))
 
-# # packed
+# packed
 # TRAIN_CMD="python scripts/train_giga.py \
 #     --dataset /data-dir/data_packed_train_processed_dex_noise/ \
 #     --dataset_raw /data-dir/data_packed_train_raw/ \
+#     --batch-size 128 \
 #     --logdir /runs-dir/ && \
 #     echo 'Done PACKED'"
 
@@ -28,6 +40,7 @@ REPO_DIR=$(dirname $(pwd))
 TRAIN_CMD="python scripts/train_giga.py \
     --dataset /data-dir/data_pile_train_processed_dex_noise/ \
     --dataset_raw /data-dir/data_pile_train_raw/ \
+    --batch-size 128 \
     --logdir /runs-dir/"
 
 RUN_STR="cd $REPO_DIR && $TRAIN_CMD && echo 'Done PILED'"
@@ -37,3 +50,8 @@ apptainer run --nv -B $REPO_DIR:/code-dir -B $WORK_DIR/GIGA/data:/data-dir \
 # elapsed time
 echo "**************************************"
 echo "--- Elapsed time: $(($SECONDS / 3600)) hrs, $((($SECONDS / 60) % 60)) min and $(($SECONDS % 60)) sec. ---"
+
+# ------------------------
+# shut down the resource monitors
+kill -s INT $GPU_PID $CPU_PID
+# ------------------------
